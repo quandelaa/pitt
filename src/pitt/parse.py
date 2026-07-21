@@ -1,6 +1,6 @@
 import argparse
 
-def parse():
+def parse() -> argparse.Namespace:
     parser = argparse.ArgumentParser(allow_abbrev=False, prog="pitt")
     subparser = parser.add_subparsers(dest="command", required=True, help="commands")
 
