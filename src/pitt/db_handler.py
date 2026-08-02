@@ -16,19 +16,24 @@ def init_db() -> None:
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               service TEXT,
               username TEXT,
-              note TEXT
-              password TEXT NOT NULL);"""
+              note TEXT,
+              password BLOB NOT NULL);"""
         )
 
     cur.executescript(
         """CREATE TABLE IF NOT EXISTS master (
-              master_hash TEXT NOT NULL);"""
+              master_hash TEXT NOT NULL,
+              salt BLOB NOT NULL);"""
         )
 
     conn.commit()
     conn.close()
 
-def configure_master_hash(new_hash: str) -> None:
+def configure_vault(salt: bytes, new_hash: str) -> None:
+    """
+    Configures the current master password hash stored in the passwords database
+    """
+
     db_path = str(get_db_path())
 
     conn = sql.connect(db_path)
@@ -38,9 +43,24 @@ def configure_master_hash(new_hash: str) -> None:
     row_count = cur.fetchone()[0]
 
     if row_count == 0:
-        cur.execute("INSERT INTO master (master_hash) VALUES ('')")
+        cur.execute("INSERT INTO master (salt, master_hash) VALUES ('', '')")
 
-    cur.execute("UPDATE master SET master_hash = ?", (new_hash,))
+    cur.execute("UPDATE master SET (master_hash, salt) = (?, ?)", (new_hash, salt))
+
+    conn.commit()
+    conn.close()
+
+def store_password(service: str | None, username: str | None, note: str | None, password: bytes) -> None:
+    """
+    Stores the password inside of the created database
+    """
+
+    db_path = str(get_db_path())
+
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+
+    cur.execute("INSERT INTO passwords (service, username, note, password) VALUES (?, ?, ?, ?)", (service, username, note, password))
 
     conn.commit()
     conn.close()
