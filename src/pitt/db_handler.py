@@ -64,3 +64,24 @@ def store_password(service: str | None, username: str | None, note: str | None, 
 
     conn.commit()
     conn.close()
+
+def get_encrypted(service: str | None, username: str | None):
+    """
+    Gets the encrypted password in the passwords database based on given service and username
+    """
+
+    db_path = str(get_db_path())
+
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+
+    if username is None and service is not None:
+        cur.execute("SELECT * FROM passwords WHERE service = ?", (service,))
+    elif username is not None and service is None:
+        cur.execute("SELECT * FROM passwords WHERE username = ?", (username,))
+    elif username is not None and service is not None:
+        cur.execute("SELECT * FROM passwords WHERE (service, username) = (?, ?)", (service, username))
+
+    results = cur.fetchall()
+    
+    return results
