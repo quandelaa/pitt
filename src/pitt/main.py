@@ -1,4 +1,4 @@
-from .functions import init, add
+from .functions import init, add, get, list
 from .parse import parse
 
 def main() -> None:
@@ -9,4 +9,6 @@ def main() -> None:
     elif args.command == "add":
         add(args.service, args.username, args.note)
     elif args.command == "get":
-        print(args.service)
+        get(args.service, args.username)
+    elif args.command == "list":
+        list()
