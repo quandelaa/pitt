@@ -1,7 +1,7 @@
 from rich.console import Console
 from getpass import getpass
 from os import urandom
-from .db_handler import init_db, configure_vault, store_password, get_encrypted
+from .db_handler import init_db, configure_vault, store_password, get_encrypted, get_all
 from .security import master_encrypt, verify_master_password, encrypt, decrypt, derive_key
 from .utils import get_db_path, check_db_exists, get_vault_property, create_password
 
@@ -116,7 +116,7 @@ def get(service: str | None, username: str | None) -> None:
     try:
         m_hash, salt = get_vault_property()
     except Exception as e:
-        console.print(f"[bold red]:( error: {e}")
+        console.print(f"\n[bold red]:( error: {e}")
         console.print("[bold yellow]! do pitt -h for help")
 
         return
@@ -127,12 +127,12 @@ def get(service: str | None, username: str | None) -> None:
         console.print("[bold red]:( wrong password!")
         return
     
-    console.print(f"\n[bold green]:) verification successful!")
+    console.print(f"[bold green]:) verification successful!")
 
     try:
         results = get_encrypted(service, username)
     except Exception as e:
-        console.print(f"[bold red]:( error: {e}")
+        console.print(f"\n[bold red]:( error: {e}")
         console.print("[bold yellow]! do pitt -h for help")
 
         return
@@ -143,7 +143,7 @@ def get(service: str | None, username: str | None) -> None:
         for row in results:
             console.print(f"{row[0]}. [bold]service: [/][honeydew2]{row[1]}[/], [bold]username: [/][light_cyan1]{row[2]}[/], [bold]note: [/][cornsilk1]{row[3]}")
 
-        console.print(f"\n[bold yellow]you have registered {len(results)} passwords that matches the given service and username properties")
+        console.print(f"\n[bold yellow]you have registered {len(results)} password that is saved with the given service or username")
 
         num_string = ", ".join([str(num+1) for num in range(len(results))])
 
@@ -175,7 +175,37 @@ def get(service: str | None, username: str | None) -> None:
 
         console.print(f"[bold green]:) copied to the clipboard successfully!")
     elif len(results) == 0:
-        console.print(f"\n[bold yellow]you have no registered password that matches the given service or username property")
+        console.print(f"\n[bold yellow]you have no registered password that is saved with the given service or username")
 
-def list() -> None:
-    pass
+def list_cmd() -> None:
+    console = Console()
+    
+    try:
+        master_password = getpass("> master password: ")
+    except KeyboardInterrupt:
+        # exit error message preventer
+        console.print("\n[bold red]bye!")
+        return
+
+    try:
+        m_hash, salt = get_vault_property()
+    except Exception as e:
+        console.print(f"\n[bold red]:( error: {e}")
+        console.print("[bold yellow]! do pitt -h for help")
+
+        return
+
+    verify = verify_master_password(master_password, m_hash)
+    
+    if verify is False:
+        console.print("[bold red]:( wrong password!")
+        return
+    
+    console.print(f"[bold green]:) verification successful!")
+
+    passwords_results = get_all()
+    
+    console.print(f"\n[bold yellow]saved passwords:")
+
+    for password in passwords_results:
+        console.print(f"{password[0]}. [bold]service: [/][honeydew2]{password[1]}[/], [bold]username: [/][light_cyan1]{password[2]}[/], [bold]note: [/][cornsilk1]{password[3]}")
