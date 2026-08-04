@@ -85,3 +85,15 @@ def get_encrypted(service: str | None, username: str | None):
     results = cur.fetchall()
     
     return results
+
+def get_all():
+    db_path = str(get_db_path())
+
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM passwords")
+
+    results = cur.fetchall()
+    
+    return results
