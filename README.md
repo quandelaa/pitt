@@ -1,6 +1,6 @@
 # pitt
 
-an extremely simple terminal-based password manager (work in progress)
+an extremely simple terminal-based password manager.
 
 ## installation
 
@@ -32,7 +32,7 @@ pip install git+https://github.com/quandelaa/pitt.git
     ```
 
 3. `pitt get`:
-    * gets the password that is saved with the given service or username (case sensitive)
+    * gets the password that is saved with the given service or username
     * decrypts the password
     * copies it to user's clipboard
 
@@ -49,6 +49,14 @@ pip install git+https://github.com/quandelaa/pitt.git
     pitt list"
     ```
 
+4. `pitt del`:
+    * deletes a password in the password vault that is saved with the given service or username 
+
+    example:
+    ```bash
+    pitt del --service github --username quandelaa"
+    ```
+
 ## license
 
 this project is licensed under the MIT License - see the LICENSE file for details
@@ -59,4 +67,4 @@ inspired by: themohitnair's sfnx | (https://github.com/themohitnair/sfnx)
 
 ---
 
-by `quandela` or `quandelaa` with the purest of joy and a little hint of confusion
+curated by `quandela` or `quandelaa` with the absolute zeal
