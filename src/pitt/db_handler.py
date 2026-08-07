@@ -65,7 +65,7 @@ def store_password(service: str | None, username: str | None, note: str | None, 
     conn.commit()
     conn.close()
 
-def get_encrypted(service: str | None, username: str | None) -> list:
+def get_by_properties(service: str | None, username: str | None) -> list:
     """
     Gets the encrypted password in the passwords database based on given service and username
     """
@@ -101,3 +101,18 @@ def get_all() -> list:
     results = cur.fetchall()
     
     return results
+
+def delete_by_password(encrypted: bytes) -> None:
+    """
+    Deletes a password entry
+    """
+
+    db_path = str(get_db_path())
+
+    conn = sql.connect(db_path)
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM passwords WHERE password = ?", (encrypted,))
+
+    conn.commit()
+    conn.close()
