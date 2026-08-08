@@ -5,7 +5,7 @@ an extremely simple terminal-based password manager.
 ## installation
 
 ```bash
-pip install git+https://github.com/quandelaa/pitt.git
+pip install pitt
 ```
 
 ## usage
