@@ -38,7 +38,7 @@ pip install git+https://github.com/quandelaa/pitt.git
 
     example:
     ```bash
-    pitt get --service github --username quandelaa"
+    pitt get --service github --username quandelaa
     ```
 
 4. `pitt list`:
@@ -54,7 +54,7 @@ pip install git+https://github.com/quandelaa/pitt.git
 
     example:
     ```bash
-    pitt del --service github --username quandelaa"
+    pitt del --service github --username quandelaa
     ```
 
 ## license
@@ -67,4 +67,4 @@ inspired by: themohitnair's sfnx | (https://github.com/themohitnair/sfnx)
 
 ---
 
-curated by `quandela` or `quandelaa` with the absolute zeal
+curated by me with passion and a teensy bit of stress
