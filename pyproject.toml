@@ -1,6 +1,6 @@
 [project]
 name = "pitt"
-version = "0.4.7"
+version = "0.4.8"
 description = "an extremely simple terminal-based password manager"
 readme = "README.md"
 authors = [
