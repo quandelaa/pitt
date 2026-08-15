@@ -1,13 +1,17 @@
 import sqlite3 as sql
-from .utils import get_db_path
+from .utils import get_db_path, check_dir_exists
 
 def init_db() -> None:
     """
     Initialize the database that will store the encrypted passwords.
     """
 
-    db_path = str(get_db_path())
-    
+    db_path = get_db_path()
+    dir_exist = check_dir_exists()
+
+    if dir_exist is False:
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+
     conn = sql.connect(db_path)
     cur = conn.cursor()
 
@@ -88,7 +92,7 @@ def get_by_properties(service: str | None, username: str | None) -> list:
 
 def get_all() -> list:
     """
-    Gets the encrypted password in the passwords database based on given service and username
+    Gets all of the details of all of the passwords
     """
 
     db_path = str(get_db_path())
