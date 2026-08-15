@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "pitt"
-version = "0.5.0"
+version = "0.7.0"
 description = "an extremely simple terminal-based password manager"
 readme = "README.md"
 description-content-type = "text/markdown"
@@ -37,5 +37,9 @@ dependencies = [
 pitt = "pitt.main:main"
 
 [project.urls]
-Homepage = "https://github.com/quandelaa/pitt"
 Repository = "https://github.com/quandelaa/pitt"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
