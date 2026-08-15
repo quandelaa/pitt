@@ -1,6 +1,6 @@
 # pitt
 
-an extremely simple terminal-based password manager.
+an extremely simple terminal-based password manager
 
 ## installation
 
@@ -14,7 +14,7 @@ pip install pitt
 
 1. `pitt init`:
     * asks for a master password
-    * when given, encrypts it using Argon2id and stores it in the database
+    * when given, hashes it using Argon2id and stores it in the database
 
     example:
     ```bash
@@ -24,7 +24,7 @@ pip install pitt
 2. `pitt add`:
     * create random password
     * encrypts the random password using Fernet
-    * stores the encrypted password with a specified username or service or note in the database
+    * stores the encrypted password with the specified username, service or note in the database
 
     example:
     ```bash
@@ -42,15 +42,17 @@ pip install pitt
     ```
 
 4. `pitt list`:
-    * lists only the details (service, username and notes) of all the saved passwords
+    * lists only the details (service, username and note) of all the saved passwords
 
     example:
     ```bash
-    pitt list"
+    pitt list
     ```
 
 4. `pitt del`:
-    * deletes a password in the password vault that is saved with the given service or username 
+    * gets the password that is saved with the given service or username
+    * asks for confirmation
+    * deletes the found password 
 
     example:
     ```bash
@@ -67,4 +69,4 @@ inspired by: themohitnair's sfnx | (https://github.com/themohitnair/sfnx)
 
 ---
 
-curated by me with passion and a teensy bit of stress
+curated by me alongside some rubber ducks
