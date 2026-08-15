@@ -16,17 +16,17 @@ def init() -> None:
 
         if check_db_exists() is True:
             db_path = get_db_path()
-            console.print(f"[bold yellow]:| your database was already initialized at [italic]{db_path}")
+            console.print(f"[bold yellow]:| your database had already been initialized at [italic]{db_path}")
 
             return
 
-        console.print("[bold yellow]! initializing..\n")
+        console.print("[bold yellow]! setting up..\n")
 
         master_password = getpass("> master password: ")
         confirm = getpass("> enter the password again (confirm): ")
 
         if master_password != confirm:
-            console.print("\n[bold red]:( passwords do not match, sorry -- aborting")
+            console.print("\n[bold red]:( passwords do not match -- aborting")
             return
 
         console.print("\n[bold green]:) matched!")
@@ -41,10 +41,10 @@ def init() -> None:
         new_hash = master_encrypt(master_password)
         configure_vault(salt, new_hash)
         
-        console.print("[bold green]:) master password successfully set up!\n")
-        console.print("[bold yellow]! do pitt -h for help")
+        console.print("[bold green]:) master password successfully set up!")
+        console.print("\n[bold yellow]! do pitt -h for help")
     except KeyboardInterrupt:
-        console.print("\n[bold red]bye!")
+        console.print("[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
@@ -59,11 +59,6 @@ def add(service: str | None, username: str | None, note: str | None) -> None:
 
     try:
         console = Console()
-                
-        if service is None and username is None and note is None:
-            console.print("[bold red]:( you have to provide atleast a note, a username or a service")
-            return
-
         master_password = getpass("> master password: ")
 
         m_hash, salt = get_vault_property()
@@ -76,7 +71,7 @@ def add(service: str | None, username: str | None, note: str | None) -> None:
 
         password = create_password()
 
-        console.print("\n[bold green]:) password created!")
+        console.print("\n[bold green]:) random password generated!")
 
         key = derive_key(master_password, salt)
         encrypted = encrypt(key, password)
@@ -88,7 +83,7 @@ def add(service: str | None, username: str | None, note: str | None) -> None:
         console.print("[bold green]:) password stored in database successfully!")
         console.print("\n[bold yellow]! do pitt -h for help")
     except KeyboardInterrupt:
-        console.print("\n[bold red]bye!")
+        console.print("[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
@@ -103,11 +98,6 @@ def get(service: str | None, username: str | None) -> None:
 
     try:
         console = Console()
-
-        if service is None and username is None:
-            console.print("[bold red]:( you have to provide atleast a username or service")
-            return
-
         master_password = getpass("> master password: ")
 
         m_hash, salt = get_vault_property()
@@ -128,7 +118,7 @@ def get(service: str | None, username: str | None) -> None:
             for i, row in enumerate(results):
                 console.print(f"{i+1}. [bold]service: [/][honeydew2]{row[1]}[/], [bold]username: [/][light_cyan1]{row[2]}[/], [bold]note: [/][cornsilk1]{row[3]}")
 
-            console.print(f"\n[bold yellow]you have registered {len(results)} password that is saved with the given service or username")
+            console.print(f"\n[bold yellow]you have registered {len(results)} passwords that are saved with the given service or username")
 
             p_index = int(console.input(f"[bold yellow]which one is the password to copy (index): "))
             encrypted_password = results[p_index-1][4]
@@ -141,6 +131,7 @@ def get(service: str | None, username: str | None) -> None:
             copy(password)
 
             console.print(f"\n[bold green]:) copied to the clipboard successfully!")
+            console.print("\n[bold yellow]! do pitt -h for help")
         elif len(results) == 1:
             row = results[0]
 
@@ -154,10 +145,11 @@ def get(service: str | None, username: str | None) -> None:
             copy(password)
 
             console.print(f"[bold green]:) copied to the clipboard successfully!")
+            console.print("\n[bold yellow]! do pitt -h for help")
         elif len(results) == 0:
             console.print(f"\n[bold yellow]you have no registered password that is saved with the given service or username")
     except KeyboardInterrupt:
-        console.print("\n[bold red]bye!")
+        console.print("[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
@@ -187,12 +179,13 @@ def list_cmd() -> None:
 
         passwords_results = get_all()
         
-        console.print(f"\n[bold yellow]saved passwords:")
+        console.print(f"\n[bold yellow]saved passwords [{len(passwords_results)}]:")
 
-        for password in passwords_results:
-            console.print(f"{password[0]}. [bold]service: [/][honeydew2]{password[1]}[/], [bold]username: [/][light_cyan1]{password[2]}[/], [bold]note: [/][cornsilk1]{password[3]}")
+        for i, password in enumerate(passwords_results):
+            console.print(f"{i+1}. [bold]service: [/][honeydew2]{password[1]}[/] | [bold]username: [/][light_cyan1]{password[2]}[/] | [bold]note: [/][cornsilk1]{password[3]}")
+        console.print("\n[bold yellow]! do pitt -h for help")
     except KeyboardInterrupt:
-        console.print("\n[bold red]bye!")
+        console.print("[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
@@ -200,17 +193,13 @@ def list_cmd() -> None:
 
         return
 
-def del_cmd(service: str | None, username: str | None) -> None:
+def del_cmd(service: str | None, username: str | None, force: bool | None) -> None:
     """
     Deletes a password from the password vault
     """
 
     try:
         console = Console()
-        
-        if service is None and username is None:
-            console.print("[bold red]:( you have to provide atleast a username or service")
-            return
 
         master_password = getpass("> master password: ")
 
@@ -232,32 +221,52 @@ def del_cmd(service: str | None, username: str | None) -> None:
             for i, row in enumerate(results):
                 console.print(f"{i+1}. [bold]service: [/][honeydew2]{row[1]}[/], [bold]username: [/][light_cyan1]{row[2]}[/], [bold]note: [/][cornsilk1]{row[3]}")
 
-            console.print(f"\n[bold yellow]you have registered {len(results)} password that is saved with the given service or username")
+            console.print(f"\n[bold yellow]you have registered {len(results)} passwords that are saved with the given service or username")
 
             p_index = int(console.input(f"[bold yellow]which one is the password to delete (index): "))
             encrypted_password = results[p_index-1][4]
+
+            res = None
+
+            if force is False:
+                console.print()
+
+                while res not in ('y', 'n', ''):
+                    res = console.input("[bold yellow]! are you sure about this (y/N): ").lower()
+
+                if res == 'y':
+                    res2 = None
+
+                    while res2 not in ('y', 'n', ''):
+                        res2 = console.input("[bold yellow]! are you really sure about this (y/N): ").lower()
+
+                    if res2 == '' or res == 'n':
+                        return
+                elif res == '' or res == 'n':
+                    return
 
             delete_by_password(encrypted_password)
         elif len(results) == 1:
             encrypted_password = results[0][4]
 
             res = None
-            console.print()
 
-            while res not in ('y', 'n', ''):
-                res = console.input("[bold yellow]! are you sure about this (y/N): ").lower()
-
-            if res == 'y':
-                res2 = None
+            if force is False:
                 console.print()
 
-                while res2 not in ('y', 'n', ''):
-                    res2 = console.input("[bold yellow]! are you really sure about this (y/N): ").lower()
+                while res not in ('y', 'n', ''):
+                    res = console.input("[bold yellow]! are you sure about this (y/N): ").lower()
 
-                if res2 == '' or res == 'n':
+                if res == 'y':
+                    res2 = None
+
+                    while res2 not in ('y', 'n', ''):
+                        res2 = console.input("[bold yellow]! are you really sure about this (y/N): ").lower()
+
+                    if res2 == '' or res == 'n':
+                        return
+                elif res == '' or res == 'n':
                     return
-            elif res == '' or res == 'n':
-                return
 
             delete_by_password(encrypted_password)
         elif len(results) == 0:
@@ -266,7 +275,7 @@ def del_cmd(service: str | None, username: str | None) -> None:
 
         console.print(f"\n[bold green]:) deletion successful!")
     except KeyboardInterrupt:
-        console.print("\n[bold red]bye!")
+        console.print("[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
