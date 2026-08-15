@@ -11,6 +11,14 @@ def get_db_path() -> Path:
     dirs = PlatformDirs("pitt")
     return dirs.user_data_path / "passwords.db"
 
+def check_dir_exists() -> bool:
+    """
+    Returns whether the pitt directory exists
+    """
+
+    db_path = get_db_path().parent
+    return db_path.is_dir()
+
 def check_db_exists() -> bool:
     """
     Returns whether the password vault database exists
@@ -77,3 +85,4 @@ def create_password() -> str:
     password = ''.join(list_char)
 
     return password
+
