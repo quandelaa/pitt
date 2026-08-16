@@ -11,7 +11,7 @@ def main() -> None:
             subparsers[args.command].print_help()
             return
 
-        add(args.service, args.username, args.note)
+        add(args.service, args.username, args.note, args.custom)
     elif args.command == "get":
         if (args.service, args.username) == (None, None):
             subparsers[args.command].print_help()
