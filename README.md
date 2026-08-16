@@ -8,6 +8,9 @@ an extremely simple terminal-based password manager
 pip install pitt
 ```
 
+# demo
+![pitt demo video](assets/pitt_demo.mp4)
+
 ## usage
 
 ### commands
