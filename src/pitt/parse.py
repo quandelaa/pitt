@@ -27,6 +27,8 @@ def parse() -> tuple:
     add_password_parser.add_argument("-u", "--username", help="specify the username that the new generated password belongs to")
     add_password_parser.add_argument("-n", "--note", help="specify notes about this particular password")
 
+    add_password_parser.add_argument("-c", "--custom", action="store_true", help="input a custom password instead of a randomly generated password")
+
     args = parser.parse_args()
 
     subparsers = {
