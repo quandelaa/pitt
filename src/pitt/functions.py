@@ -52,7 +52,7 @@ def init() -> None:
 
         return
 
-def add(service: str | None, username: str | None, note: str | None) -> None:
+def add(service: str | None, username: str | None, note: str | None, custom: bool) -> None:
     """
     Adds a password to the password vault with the given service, username and a note
     """
@@ -69,9 +69,14 @@ def add(service: str | None, username: str | None, note: str | None) -> None:
             console.print("[bold red]:( wrong password!")
             return
 
-        password = create_password()
+        console.print(f"[bold green]:) verification successful!")
 
-        console.print("\n[bold green]:) random password generated!")
+        if custom is False:
+            password = create_password()
+            console.print("\n[bold green]:) random password generated!")
+        elif custom is True:
+            password = getpass("\n> custom password: ")
+            console.print()
 
         key = derive_key(master_password, salt)
         encrypted = encrypt(key, password)
@@ -193,7 +198,7 @@ def list_cmd() -> None:
 
         return
 
-def del_cmd(service: str | None, username: str | None, force: bool | None) -> None:
+def del_cmd(service: str | None, username: str | None, force: bool) -> None:
     """
     Deletes a password from the password vault
     """
