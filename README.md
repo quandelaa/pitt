@@ -9,7 +9,7 @@ pip install pitt
 ```
 
 # demo
-![pitt demo video](assets/pitt_demonstration.mp4)
+[![pitt demo](https://img.youtube.com/vi/g3S1TFWb2uU/maxresdefault.jpg)](https://www.youtube.com/watch?v=g3S1TFWb2uU)
 
 ## usage
 
