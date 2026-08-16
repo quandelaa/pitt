@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "pitt"
-version = "0.8.0"
+version = "0.8.2"
 description = "an extremely simple terminal-based password manager"
 readme = "README.md"
 description-content-type = "text/markdown"
