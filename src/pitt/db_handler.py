@@ -1,6 +1,11 @@
 import sqlite3 as sql
 from .utils import get_db_path, check_dir_exists
 
+DB_PATH = get_db_path()
+
+def get_conn() -> sql.Connection:
+    return sql.connect(DB_PATH)
+
 def init_db() -> None:
     """
     Initialize the database that will store the encrypted passwords.
@@ -12,7 +17,7 @@ def init_db() -> None:
     if dir_exist is False:
         db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    conn = sql.connect(db_path)
+    conn = get_conn()
     cur = conn.cursor()
 
     cur.executescript(
@@ -38,9 +43,7 @@ def configure_vault(salt: bytes, new_hash: str) -> None:
     Configures the current master password hash stored in the passwords database
     """
 
-    db_path = str(get_db_path())
-
-    conn = sql.connect(db_path)
+    conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("SELECT COUNT(*) FROM master")
@@ -59,9 +62,7 @@ def store_password(service: str | None, username: str | None, note: str | None, 
     Stores the password inside of the created database
     """
 
-    db_path = str(get_db_path())
-
-    conn = sql.connect(db_path)
+    conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("INSERT INTO passwords (service, username, note, password) VALUES (?, ?, ?, ?)", (service, username, note, password))
@@ -74,9 +75,7 @@ def get_by_properties(service: str | None, username: str | None) -> list:
     Gets the encrypted password in the passwords database based on given service and username
     """
 
-    db_path = str(get_db_path())
-
-    conn = sql.connect(db_path)
+    conn = get_conn()
     cur = conn.cursor()
 
     if username is None and service is not None:
@@ -95,9 +94,7 @@ def get_all() -> list:
     Gets all of the details of all of the passwords
     """
 
-    db_path = str(get_db_path())
-
-    conn = sql.connect(db_path)
+    conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM passwords")
@@ -111,9 +108,7 @@ def delete_by_password(encrypted: bytes) -> None:
     Deletes a password entry
     """
 
-    db_path = str(get_db_path())
-
-    conn = sql.connect(db_path)
+    conn = get_conn()
     cur = conn.cursor()
 
     cur.execute("DELETE FROM passwords WHERE password = ?", (encrypted,))
