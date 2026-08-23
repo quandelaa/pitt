@@ -23,6 +23,11 @@ def init() -> None:
         console.print("[bold yellow]! setting up..\n")
 
         master_password = getpass("> master password: ")
+        
+        if master_password.isspace() or master_password == "":
+            console.print("\n[bold red]:( master password cannot be whitespace")
+            return
+
         confirm = getpass("> enter the password again (confirm): ")
 
         if master_password != confirm:
