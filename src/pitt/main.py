@@ -1,11 +1,11 @@
-from .functions import init, add, get, list_cmd, del_cmd
+from .functions import init, add, get, list_cmd, del_cmd, export_cmd
 from .parse import parse 
 
 def main() -> None:
     args, subparsers = parse()  
 
     if args.command == "init":
-        init()
+        init(args.importp)
     elif args.command == "add":
         if (args.service, args.username, args.note) == (None, None, None):
             subparsers[args.command].print_help()
@@ -26,3 +26,5 @@ def main() -> None:
             return
 
         del_cmd(args.service, args.username, args.force)
+    elif args.command == "exp":
+        export_cmd(args.path)
