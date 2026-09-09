@@ -1,3 +1,5 @@
+from pitt.security import encrypt
+from csv import reader
 import sqlite3 as sql
 from .utils import get_db_path, check_dir_exists
 
@@ -115,3 +117,18 @@ def delete_by_password(encrypted: bytes) -> None:
 
     conn.commit()
     conn.close()
+
+def csv_import(import_path: str, key: bytes) -> None:
+    with open(import_path, 'r', newline='') as f:
+        f_reader = reader(f)
+
+        f_reader.__next__()
+
+        for row in f_reader:
+            encrypted = encrypt(key, row[4])
+
+            service = row[1] if row[1] != "" else None
+            username = row[2] if row[2] != "" else None
+            note = row[3] if row[3] != "" else None
+
+            store_password(service, username, note, encrypted)

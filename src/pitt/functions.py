@@ -1,12 +1,14 @@
+from pathlib import Path
 from rich.console import Console
 from getpass import getpass
 from pyperclip import copy
 from os import urandom
-from .db_handler import init_db, configure_vault, store_password, get_by_properties, get_all, delete_by_password
+from .db_handler import init_db, configure_vault, store_password, get_by_properties, get_all, delete_by_password, csv_import
 from .security import master_encrypt, verify_master_password, encrypt, decrypt, derive_key
 from .utils import get_db_path, check_db_exists, get_vault_property, create_password
+from csv import writer
 
-def init() -> None:
+def init(import_path: str | None) -> None:
     """
     Initialize the password manager's master password and the database
     """
@@ -21,7 +23,6 @@ def init() -> None:
             return
 
         console.print("[bold yellow]! setting up..\n")
-
         master_password = getpass("> master password: ")
         
         if master_password.isspace() or master_password == "":
@@ -39,17 +40,24 @@ def init() -> None:
         db_path = str(get_db_path())
         init_db()
 
+        if import_path is not None and Path(import_path).expanduser().is_file() is False:
+            console.print("\n[bold red] invalid path!")
+
         console.print(f"[bold green]:) database set up at [italic]{db_path}")
 
         salt = urandom(16)
         
         new_hash = master_encrypt(master_password)
         configure_vault(salt, new_hash)
+
+        if import_path is not None:
+            key = derive_key(master_password, salt)
+            csv_import(import_path, key)
         
         console.print("[bold green]:) master password successfully set up!")
         console.print("\n[bold yellow]! do pitt -h for help")
     except KeyboardInterrupt:
-        console.print("[bold red]bye!")
+        console.print("\n[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
@@ -93,7 +101,7 @@ def add(service: str | None, username: str | None, note: str | None, custom: boo
         console.print("[bold green]:) password stored in database successfully!")
         console.print("\n[bold yellow]! do pitt -h for help")
     except KeyboardInterrupt:
-        console.print("[bold red]bye!")
+        console.print("\n[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
@@ -159,7 +167,7 @@ def get(service: str | None, username: str | None) -> None:
         elif len(results) == 0:
             console.print(f"\n[bold yellow]you have no registered password that is saved with the given service or username")
     except KeyboardInterrupt:
-        console.print("[bold red]bye!")
+        console.print("\n[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
@@ -195,7 +203,7 @@ def list_cmd() -> None:
             console.print(f"{i+1}. [bold]service: [/][honeydew2]{password[1]}[/] | [bold]username: [/][light_cyan1]{password[2]}[/] | [bold]note: [/][cornsilk1]{password[3]}")
         console.print("\n[bold yellow]! do pitt -h for help")
     except KeyboardInterrupt:
-        console.print("[bold red]bye!")
+        console.print("\n[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
@@ -285,7 +293,57 @@ def del_cmd(service: str | None, username: str | None, force: bool) -> None:
 
         console.print(f"\n[bold green]:) deletion successful!")
     except KeyboardInterrupt:
-        console.print("[bold red]bye!")
+        console.print("\n[bold red]bye!")
+        return
+    except Exception as e:
+        console.print(f"\n[bold red]:( error: {e}")
+        console.print("[bold yellow]! do pitt -h for help")
+
+        return
+
+def export_cmd(path: str | None) -> None:
+    """
+    Exports all the saved passwords into one csv file in the specified path
+    """
+    
+    try:
+        console = Console()
+
+        master_password = getpass("> master password: ")
+        m_hash, salt = get_vault_property()
+
+        verify = verify_master_password(master_password, m_hash)
+        
+        if verify is False:
+            console.print("[bold red]:( wrong password!")
+            return
+        
+        console.print(f"[bold green]:) verification successful!")
+        
+        while path is None or Path(path).expanduser().is_dir() is False:
+            path = console.input("[bold yellow]! path to save csv file in: ")
+
+        output_file_name = "pitt_export.csv"
+        passwords_results = get_all()
+        new_path = Path(path).expanduser() / output_file_name
+
+        with open(new_path, 'w', newline='') as f:
+            headers = ["id", "service", "username", "note", "password"]
+
+            f_writer = writer(f)
+            f_writer.writerow(headers)
+
+            for i, row in enumerate(passwords_results):
+                key = derive_key(master_password, salt)
+                decrypted = decrypt(key, row[4]).decode("utf-8")
+
+                new_row = [i+1, row[1], row[2], row[3], decrypted]
+
+                f_writer.writerow(new_row)
+
+        console.print(f"\n[bold green]:) export successful!")
+    except KeyboardInterrupt:
+        console.print("\n[bold red]bye!")
         return
     except Exception as e:
         console.print(f"\n[bold red]:( error: {e}")
