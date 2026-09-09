@@ -4,64 +4,52 @@ an extremely simple terminal-based password manager
 
 ## installation
 
+pip
 ```bash
 pip install pitt
+```
+
+uv
+```bash
+uv tool install pitt
 ```
 
 # demo
 [![pitt demo](https://img.youtube.com/vi/g3S1TFWb2uU/maxresdefault.jpg)](https://www.youtube.com/watch?v=g3S1TFWb2uU)
 (click)
 
-## usage
+## workflow
 
-### commands
+1. initializing the password manager:
+    - new:
+        - `pitt init` and follow the instructions
+    - import from csv (exported pitt passwords):
+        * `pitt init -i /path/to/.csv` and follow the instructions
 
-1. `pitt init`:
-    * asks for a master password
-    * when given, hashes it using Argon2id and stores it in the database
+2. adding a password:
+    - randomly generated password:
+        - you'd have to specify a service, username or a note that'll be attached with the newly generated password when saved.
+        * `pitt add -s service_example -u username_example -n "note example"`
+    - custom password:
+        - you'd have to still specify one of the three things (username, service, note)
+        * `pitt add -s service_example -u username_example -n "note example" -c` (note the added -c flag)
 
-    example:
-    ```bash
-    pitt init
-    ```
+3. deleting a password:
+    - you need to specify the service or username (can be both but cannot be the note) that is affiliated with the saved password you want to delete.
+    * `pitt del -s service_example -f` (the -f or --force flag will disgard the 'are you sure' confirmations and straight up just deletes the password. use -f with caution)
 
-2. `pitt add`:
-    * create random password
-    * encrypts the random password using Fernet
-    * stores the encrypted password with the specified username, service or note in the database
+4. getting a password:
+    - you need to specify the service or username (can be both) but cannot be the note that is affiliated with the saved password you want to get (copy to clipboard).
+    * `pitt get -s service_example`
 
-    example:
-    ```bash
-    pitt add --service github --username quandelaa --note "this is my song"
-    ```
+5. listing all the saved passwords' information:
+    * `pitt list` (this will only list all the information that's attached to each password, not the passwords themselves.)
 
-3. `pitt get`:
-    * gets the password that is saved with the given service or username
-    * decrypts the password
-    * copies it to user's clipboard
-
-    example:
-    ```bash
-    pitt get --service github --username quandelaa
-    ```
-
-4. `pitt list`:
-    * lists only the details (service, username and note) of all the saved passwords
-
-    example:
-    ```bash
-    pitt list
-    ```
-
-4. `pitt del`:
-    * gets the password that is saved with the given service or username
-    * asks for confirmation
-    * deletes the found password 
-
-    example:
-    ```bash
-    pitt del --service github --username quandelaa
-    ```
+6. export all the saved passwords:
+    - interactive mode:
+        * `pitt exp` 
+    - manual mode:
+        * `pitt exp -p /path/to/wherever`
 
 ## license
 
